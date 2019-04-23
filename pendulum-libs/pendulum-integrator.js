@@ -119,9 +119,10 @@ class PendulumIntegrator
     this.ode.setStop(this.ode.start + this.dt);
     this.ode.solve();
     let phi = this.ode.newX[0];
+    let p = this.ode.newX[1];
     this.ode.adoptCurrentState();
 
-    return {t: this.ode.start, x: phi};
+    return {t: this.ode.start, x: phi, xdot: p};
   }
 
 }

@@ -18,6 +18,7 @@
         <div id="pendulum_container" style="margin:2;"></div>
         <div id="pendulum_plot_container" style="margin:2;"></div>
         <br>
+        <!--
         <div>
            <i>Developed for 
                <a href="https://complexityexplorer.org">
@@ -28,6 +29,7 @@
                <a href="http://rki.de">Robert Koch-Institute</a>.
            </i>
         </div>    
+        -->
 
     </div>
 
@@ -40,11 +42,16 @@
                              plot_width:400,
                              pendulum_width:500,
                              pendulum_height:500,
+                             draw_driver:true,
+                             plot_config:{
+                                 margin: 20,
+                             },
                              integrator_config: {
-                                    friction: 0.2, 
-                                    natural_frequency: 1.5,
-                                    driving_force: 10.01,                                 
-                                    dt: 0.01,
+                                    friction: 0.25, 
+                                    natural_frequency: 1,
+                                    driving_frequency: 2/3,
+                                    driving_force: 1.4955,
+                                    dt: 0.05,
                              }
                             }); 
     pend.start();
