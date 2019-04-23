@@ -13,23 +13,10 @@
 </head>
 <body>
 
-    <div id="all_container">
+    <div id="main_container">
 
         <div id="pendulum_container" style="margin:2;"></div>
         <div id="pendulum_plot_container" style="margin:2;"></div>
-        <br>
-        <!--
-        <div>
-           <i>Developed for 
-               <a href="https://complexityexplorer.org">
-                 SFI's Complexity Explorer</a>
-               by
-               <a href="http://benmaier.org">Ben F. Maier</a>
-               in collaboration with the
-               <a href="http://rki.de">Robert Koch-Institute</a>.
-           </i>
-        </div>    
-        -->
 
     </div>
 
@@ -40,18 +27,21 @@
                              pendulum_div: '#pendulum_container',
                              plot_div: '#pendulum_plot_container', 
                              plot_width:400,
-                             pendulum_width:500,
-                             pendulum_height:500,
+                             phase_space:'periodic',
+                             pendulum_width:300,
+                             pendulum_height:300,
                              draw_driver:true,
+                             draw_friction:true,
                              plot_config:{
                                  margin: 20,
+                                 fastScatter: true
                              },
                              integrator_config: {
                                     friction: 0.25, 
                                     natural_frequency: 1,
                                     driving_frequency: 2/3,
                                     driving_force: 1.4955,
-                                    dt: 0.05,
+                                    dt: 0.07,
                              }
                             }); 
     pend.start();

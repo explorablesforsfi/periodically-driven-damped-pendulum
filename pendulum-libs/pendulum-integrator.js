@@ -106,7 +106,7 @@ class PendulumIntegrator
 
     fn[1] = function(time, x) {
       let w2 = Math.pow(self.natural_frequency,2);
-      return - 2 * self.friction*x[1] - w2 * Math.sin(x[0]) + self.driving_force * w2 * Math.cos(self.driving_frequency * time);
+      return - 2 * self.friction*x[1] - w2 * Math.sin(x[0]) + self.driving_force * Math.cos(self.driving_frequency * time);
     };
 
     this.equations_of_motion = fn;

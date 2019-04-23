@@ -9,10 +9,12 @@ class Pendulum
       plot_div: null,
       pendulum_width: 200,
       pendulum_height: 200,
+      phase_space: 'non-periodic',
       plot_width: 300,
       plot_height: 200,
       integrator_config: {},
       draw_driver: false,
+      draw_friction: false,
       plot_config: {
         margin: 14,
         fontsize: 12
@@ -24,6 +26,10 @@ class Pendulum
       config[key] = user_config[key];
     });
 
+    this.integrator_config = config.integrator_config;
+    this.pendulum_integrator = new PendulumIntegrator(this.integrator_config);
+    this.timer = null;
+
     this.draw_pendulum = (config.pendulum_div !== null);
     this.plot_pendulum = (config.plot_div !== null);
 
@@ -33,6 +39,8 @@ class Pendulum
     this.plot_height = config.plot_height;
     this.plot_config = config.plot_config;
     this.draw_driver = config.draw_driver;
+    this.draw_friction = config.draw_friction;
+    this.phase_space = config.phase_space;
 
     if (this.draw_pendulum)
       this.init_draw_canvas(config.pendulum_div);
@@ -43,10 +51,6 @@ class Pendulum
     this.init_draw();
     this.reset_observables();
 
-    this.integrator_config = config.integrator_config;
-    this.timer = null;
-
-    this.pendulum_integrator = new PendulumIntegrator(this.integrator_config);
 
 
   }
@@ -58,8 +62,17 @@ class Pendulum
     this.timer = d3.timer( function(elapsed){
 
       let res = self.pendulum_integrator.get_next_result();
+      let phi = res.x;
       self.time.push(res.t);
       self.phi.push(res.x);
+      if (self.phase_space == 'periodic')
+      {
+        while (phi>2*Math.PI)
+          phi -= 2*Math.PI;
+        while (phi<0)
+          phi += 2*Math.PI;
+        self.periodic_phi.push(phi);
+      }
       self.phidot.push(res.xdot);
 
       if (self.draw_pendulum)
@@ -77,10 +90,15 @@ class Pendulum
 
   draw_update()
   {
+    let ctx = this.draw_ctx;
+    ctx.save();
+
     let w = this.pendulum_width;
     let h = this.pendulum_height
-    this.draw_ctx.clearRect(0,0,w,h);
-    let L = h/4;
+
+    ctx.clearRect(0,0,w,h);
+
+    let L = h/3;
     let x0 = w/2; 
     let y0 = h/2;
     let r = w/32;
@@ -89,7 +107,6 @@ class Pendulum
     let x1 =  L*Math.cos(phi-Math.PI/2) + x0;
     let y1 = -L*Math.sin(phi-Math.PI/2) + y0;
 
-    let ctx = this.draw_ctx;
 
     if (this.draw_driver)
     {
@@ -97,8 +114,7 @@ class Pendulum
       ctx.lineWidth = rsmall/2;
       ctx.beginPath();
       let gamma = this.pendulum_integrator.driving_force;
-      let w2 = Math.pow(this.pendulum_integrator.natural_frequency,2);
-      let xF = 20*gamma*w2*Math.cos(this.pendulum_integrator.driving_frequency*this.time[this.time.length-1]);
+      let xF = 20*gamma*Math.cos(this.pendulum_integrator.driving_frequency*this.time[this.time.length-1]);
       xF += x0;
       ctx.moveTo(x0,y0);
       ctx.lineTo(xF,y0);
@@ -112,25 +128,45 @@ class Pendulum
     ctx.lineTo(x1,y1);
     ctx.stroke();
 
-    ctx.beginPath();
-    ctx.moveTo(x1 + r, y1);
-    ctx.arc(x1, y1, r, 0, 2 * Math.PI);
-    ctx.fill();
-    ctx.stroke();
+    ctx.lineWidth = 1.5;
 
+    ctx.strokeStyle = "#fff";
     ctx.beginPath();
     ctx.moveTo(x0 + rsmall/2, y0);
     ctx.arc(x0, y0, rsmall/2, 0, 2 * Math.PI);
     ctx.fill();
     ctx.stroke();
 
+    ctx.beginPath();
+    if (this.draw_friction)
+    {
+      let friction_color = d3.scaleLinear().range([0,255]).domain([0,1]);
+      let f = 2*this.pendulum_integrator.friction;
+      let friction = f*Math.abs(this.phidot[this.phidot.length-1]);
+      ctx.fillStyle = "rgb("+Math.floor(friction_color(friction))+",0,0)";
+      //ctx.strokeStyle = "rgb("+(255-Math.floor(friction_color(friction)))+",255,255)";
+    }
+
+    ctx.moveTo(x1 + r, y1);
+    ctx.arc(x1, y1, r, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.stroke();
+
+    this.draw_ctx.restore();
 
   }
 
   plot_update()
   {
     this.pl.plot("trajectory",this.time, this.phi);
-    this.ps_pl.plot("trajectory",this.phi, this.phidot);
+
+    if (this.phase_space == 'periodic')
+    {
+      this.ps_pl.scatter("trajectory",this.periodic_phi, this.phidot, {markerradius:1,markeredgewidth:0}, false);
+      this.ps_pl.draw_last_point("trajectory");
+    }
+    else
+      this.ps_pl.plot("trajectory",this.phi, this.phidot);
   }
 
   init_draw_canvas(div)
@@ -198,7 +234,14 @@ class Pendulum
     this.pl.ylabel('angle');
     this.ps_pl.xlimlabels(['','']);
     this.ps_pl.ylimlabels(['','']);
-    this.ps_pl.xlabel('angle');
+    if (this.phase_space == 'periodic')
+    {
+      this.ps_pl.xlabel('angle (periodic)');
+      this.ps_pl.xlimlabels([-Math.PI,+Math.PI])
+      this.ps_pl.xlimlabels(['-π','+π'])
+    }
+    else
+      this.ps_pl.xlabel('angle');
     this.ps_pl.ylabel('angular velocity');
   }
 
@@ -208,8 +251,15 @@ class Pendulum
 
   reset_observables()
   {
+    /*
+    this.time = [0];
+    this.phi = [this.pendulum_integrator.initial_position];
+    this.periodic_phi = [this.pendulum_integrator.initial_position];
+    this.phidot = [this.pendulum_integrator.initial_velocity];
+    */
     this.time = [];
     this.phi = [];
+    this.periodic_phi = [];
     this.phidot = [];
   }
 

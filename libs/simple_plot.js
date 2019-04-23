@@ -248,6 +248,63 @@ class simplePlot {
     this.draw();
   }
 
+  draw_last_point(scatterlabel)
+  {
+    let label = scatterlabel;
+    let ctx = this.ctx;
+    let xS = this.xScale;
+    let yS = this.yScale;
+    let mrgn = this.margin;
+    let rmrgn = this.rmrgn;
+    let tmrgn = this.tmrgn;
+
+    let w = this.w;
+    let h = this.h;
+
+    ctx.save()
+    ctx.lineWidth = 0;
+    ctx.rect(mrgn, tmrgn, this.w - (mrgn+rmrgn), this.h - (mrgn+tmrgn));
+    //ctx.stroke();
+    //ctx.clip();
+    ctx.lineWidth = 0;
+
+    // =========== DRAW CURVES ===============
+    ctx.beginPath();
+      if (this.scatterData.hasOwnProperty(scatterlabel)) {
+        let x = this.scatterData[label].x;
+        let y = this.scatterData[label].y;
+        let m = this.scatterData[label].marker;
+        let mr = this.scatterData[label].markerradius;
+        let md = 2 * mr;
+        let mc = this.scatterData[label].markercolor;
+        let mew = this.scatterData[label].markeredgewidth;
+        let mec = this.scatterData[label].markeredgecolor;
+
+
+        ctx.lineWidth = mew;
+        ctx.strokeStyle = mec;
+        ctx.fillStyle = mc;
+
+        let i = x.length-1;
+        let _x = xS(x[i]);
+        let _y = yS(y[i]);
+
+        if (m == 's') 
+        {
+            ctx.rect(_x - mr, _y - mr, md, md);
+        }
+        else //if (m == 'o')
+        {
+            ctx.moveTo(_x + mr, _y);
+            ctx.arc(_x, _y, mr, 0, 2 * Math.PI);
+        }
+        ctx.fill();
+        ctx.stroke();
+
+      }
+      ctx.restore();
+  }
+
   draw() {
     let ctx = this.ctx;
     let xS = this.xScale;
