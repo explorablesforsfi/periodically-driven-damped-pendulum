@@ -5,7 +5,9 @@
 <script src="./libs/d3-color.v1.min.js"></script>
 <script src="./libs/simple_plot.js"></script>
 <script src="./libs/widget.v3.4.js"></script>
-<script src="./libs/bundle.js"></script>
+<script src="./libs/rk45-min.js"></script>
+<script src="./pendulum-libs/pendulum-integrator.js"></script>
+<script src="./pendulum-libs/pendulum.js"></script>
 <link rel="stylesheet" type="text/css" href="./css/widgets_white_bg.css">
 <link rel="stylesheet" type="text/css" href="./css/main.css">
 </head>
@@ -13,7 +15,8 @@
 
     <div id="all_container">
 
-        <div id="pendulum_container"></div>
+        <div id="pendulum_container" style="margin:2;"></div>
+        <div id="pendulum_plot_container" style="margin:2;"></div>
         <br>
         <div>
            <i>Developed for 
@@ -30,6 +33,22 @@
 
 
 
+<script>
+    var pend = new Pendulum({
+                             pendulum_div: '#pendulum_container',
+                             plot_div: '#pendulum_plot_container', 
+                             plot_width:400,
+                             pendulum_width:500,
+                             pendulum_height:500,
+                             integrator_config: {
+                                    friction: 0.2, 
+                                    natural_frequency: 1.5,
+                                    driving_force: 10.01,                                 
+                                    dt: 0.01,
+                             }
+                            }); 
+    pend.start();
+</script>
 
 </body>
 
