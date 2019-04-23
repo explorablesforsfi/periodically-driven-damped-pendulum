@@ -1,22 +1,21 @@
-# Site Percolation
+# Periodically Driven Damped Pendulum
 
-This is a small web app to demonstrate site percolation and
-explore the occuring phase transition.
+Explore what happens when a pendulum is driven by a periodic external force but loses energy through friction, as well.
 
 ## Run
 
 First, clone this repository
 
-    git clone https://github.com/explorablesforsfi/percolation.git
+    git clone https://github.com/explorablesforsfi/periodically-driven-damped-pendulum.git
 
 Then change to this repository and start a local webserver
 
-    cd percolation
+    cd periodically-driven-damped-pendulum
     python -m "http.server" 1313
     
 Go to your browser and navigate to http://localhost:1313 .
 
-![percolation](https://github.com/explorablesforsfi/percolation/raw/master/img/example.png)
+![periodically-driven-damped-pendulum](https://github.com/explorablesforsfi/periodically-driven-damped-pendulum/raw/master/img/example.png)
 
 ## License
 
@@ -29,4 +28,5 @@ All original code in this repository, i.e. all code which is not in the subdirec
 | `d3-scale-chromatic.v1.min.js` | BSD 3-Clause "New" or "Revised" License | [d3-scale-chromatic](https://github.com/d3/d3-scale-chromatic)|
 | `d3.v4.min.js`                 | BSD 3-Clause "New" or "Revised" License | [d3](https://github.com/d3/d3)|
 | `simple_plot.js`               | CC 4.0                                  | [simple-plot](https://github.com/benmaier/simple-plot)|
+| `rk45-min.js`                  | MIT                                  | [RK45js](https://github.com/benmaier/RK45js)|
 | `widget.v3.4.js`               | permission to use given by D. Brockmann | [complexity explorables](http://www.complexity-explorables.org) |
