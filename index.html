@@ -6,6 +6,7 @@
 <script src="./libs/simple_plot.js"></script>
 <script src="./libs/widget.v3.4.js"></script>
 <script src="./libs/rk45-min.js"></script>
+<script src="./gui/main_gui.js"></script>
 <script src="./pendulum-libs/pendulum-integrator.js"></script>
 <script src="./pendulum-libs/pendulum.js"></script>
 <link rel="stylesheet" type="text/css" href="./css/widgets_white_bg.css">
@@ -13,19 +14,164 @@
 </head>
 <body>
 
+    <div id="standard_container" style="">
+
+        <div id="standard_gui_container" style="margin:2;"></div>
+        <div id="standard_pendulum_container" style="margin:2;"></div>
+        <div id="standard_plot_container" style="margin:2;"></div>
+
+    </div>
+
+    <div id="friction_container">
+
+        <div id="friction_gui_container" style="margin:2;"></div>
+        <div id="friction_pendulum_container" style="margin:2;"></div>
+        <div id="friction_plot_container" style="margin:2;"></div>
+
+    </div>
+
+    <div id="driven_container">
+
+        <div id="driven_gui_container" style="margin:2;"></div>
+        <div id="driven_pendulum_container" style="margin:2;"></div>
+        <div id="driven_plot_container" style="margin:2;"></div>
+
+    </div>
+
     <div id="main_container">
 
+        <div id="main_gui_container" style="margin:2;"></div>
         <div id="pendulum_container" style="margin:2;"></div>
-        <div id="pendulum_plot_container" style="margin:2;"></div>
+        <div id="plot_container" style="margin:2;"></div>
 
     </div>
 
 
 
 <script>
+    var std_pend = new Pendulum({
+                             pendulum_div: '#standard_pendulum_container',
+                             plot_div: '#standard_plot_container', 
+                             plot_width:100,
+                             plot_height:100,
+                             phase_space:'periodic',
+                             pendulum_width:200,
+                             pendulum_height:100,
+                             plot_config:{
+                                 margin: 20,
+                                 fastScatter: true
+                             },
+                             integrator_config: {
+                                    friction: 0, 
+                                    natural_frequency: 1,
+                                    driving_force: 0,
+                                    dt: 0.07,
+                             },
+                            }); 
+    std_pend.pl.ylim([-Math.PI/2,Math.PI/2]);
+    std_pend.pl.ylimlabels(['-π/2','π/2'])
+    std_pend.ps_pl.xlim([-Math.PI/2,Math.PI/2]);
+    std_pend.ps_pl.xlimlabels(['-π/2','π/2'])
+    std_pend.ps_pl.xlabel('angle')
+
+    //std_pend.start();
+    d3.select("#standard_container")
+      .on("mouseover", function() {std_pend.start()})
+      .on("mouseout", function() {std_pend.stop()})
+    ;
+
+    var fric_pend = new Pendulum({
+                             pendulum_div: '#friction_pendulum_container',
+                             plot_div: '#friction_plot_container', 
+                             plot_width:100,
+                             plot_height:100,
+                             phase_space:'periodic',
+                             pendulum_width:200,
+                             pendulum_height:100,
+                             draw_friction:true,
+                             plot_config:{
+                                 margin: 20,
+                                 fastScatter: true
+                             },
+                             integrator_config: {
+                                    friction: 0.5, 
+                                    natural_frequency: 2,
+                                    driving_force: 0,
+                                    dt: 0.01,
+                             },
+                             update_callback: function() {
+                                 if (
+                                      (Math.abs(fric_pend.periodic_phi[fric_pend.periodic_phi.length-1]) < 1e-3)
+                                    &&
+                                      (Math.abs(fric_pend.phidot[fric_pend.phidot.length-1]) < 2e-2)
+                                     )
+                                 {
+                                     let was_running = fric_pend.is_running;
+                                     if (was_running)
+                                         fric_pend.stop();
+
+                                     fric_pend.pendulum_integrator.reset_ode();
+                                     fric_pend.reset_observables();
+
+                                     if (was_running)
+                                         fric_pend.start();
+
+                                 }
+                             }
+                            }); 
+    fric_pend.pl.ylim([-Math.PI/2,Math.PI/2]);
+    fric_pend.pl.ylimlabels(['-π/2','π/2'])
+    fric_pend.ps_pl.xlim([-Math.PI/2,Math.PI/2]);
+    fric_pend.ps_pl.xlimlabels(['-π/2','π/2'])
+    fric_pend.ps_pl.xlabel('angle')
+    //std_pend.start();
+    d3.select("#friction_container")
+      .on("mouseover", function() {fric_pend.start()})
+      .on("mouseout", function() {fric_pend.stop()})
+    ;
+
+
+    var driven_pend = new Pendulum({
+                             pendulum_div: '#driven_pendulum_container',
+                             plot_div: '#driven_plot_container', 
+                             plot_width:100,
+                             plot_height:100,
+                             phase_space:'periodic',
+                             pendulum_width:200,
+                             pendulum_height:100,
+                             draw_driver:true,
+                             plot_config:{
+                                 margin: 20,
+                                 fastScatter: true
+                             },
+                             integrator_config: {
+                                    friction: 0, 
+                                    natural_frequency: 0,
+                                    driving_frequency: 1,
+                                    driving_force: 1,
+                                    dt: 0.07,
+                                    initial_position: -1 
+                             }
+                            }); 
+    driven_pend.pl.ylim([-1,1]);
+    driven_pend.pl.ylimlabels(['-1','+1'])
+    driven_pend.ps_pl.xlim([-1,1]);
+    driven_pend.ps_pl.xlimlabels(['-1','+1'])
+    driven_pend.ps_pl.xlabel('angle')
+    //std_pend.start();
+    //std_pend.start();
+    d3.select("#driven_container")
+      .on("mouseover", function() {driven_pend.start()})
+      .on("mouseout", function() {driven_pend.stop()})
+    ;
+
+
+
+
+    // Start the main simulation with all forces
     var pend = new Pendulum({
                              pendulum_div: '#pendulum_container',
-                             plot_div: '#pendulum_plot_container', 
+                             plot_div: '#plot_container', 
                              plot_width:400,
                              phase_space:'periodic',
                              pendulum_width:300,
@@ -44,7 +190,7 @@
                                     dt: 0.07,
                              }
                             }); 
-    pend.start();
+    start_main_gui("#main_gui_container",450,150,pend);
 </script>
 
 </body>

@@ -18,7 +18,8 @@ class Pendulum
       plot_config: {
         margin: 14,
         fontsize: 12
-      }
+      },
+      update_callback: function () {}
     }
 
     // overwrite default configuration with user configuration
@@ -41,15 +42,25 @@ class Pendulum
     this.draw_driver = config.draw_driver;
     this.draw_friction = config.draw_friction;
     this.phase_space = config.phase_space;
+    this.update_callback = config.update_callback;
+
+    this.is_running = false;
+    this.reset_observables();
 
     if (this.draw_pendulum)
+    {
       this.init_draw_canvas(config.pendulum_div);
+      this.init_draw();
+      this.draw_update();
+    }
     if (this.plot_pendulum)
+    {
       this.init_plot_canvas(config.plot_div);
+      this.init_plot();
+      this.plot_update();
+    }
 
-    this.init_plot();
-    this.init_draw();
-    this.reset_observables();
+
 
 
 
@@ -58,18 +69,19 @@ class Pendulum
   start()
   {
     let self = this;
+    this.is_running = true;
 
     this.timer = d3.timer( function(elapsed){
 
       let res = self.pendulum_integrator.get_next_result();
       let phi = res.x;
       self.time.push(res.t);
-      self.phi.push(res.x);
+      self.phi.push(phi);
       if (self.phase_space == 'periodic')
       {
-        while (phi>2*Math.PI)
+        while (phi>Math.PI)
           phi -= 2*Math.PI;
-        while (phi<0)
+        while (phi<=-Math.PI)
           phi += 2*Math.PI;
         self.periodic_phi.push(phi);
       }
@@ -80,12 +92,15 @@ class Pendulum
       if (self.plot_pendulum)
         self.plot_update();
 
+      self.update_callback();
+
     });
   }
 
   stop()
   {
     this.timer.stop();
+    this.is_running = false;
   }
 
   draw_update()
@@ -237,8 +252,9 @@ class Pendulum
     if (this.phase_space == 'periodic')
     {
       this.ps_pl.xlabel('angle (periodic)');
-      this.ps_pl.xlimlabels([-Math.PI,+Math.PI])
-      this.ps_pl.xlimlabels(['-π','+π'])
+
+      this.ps_pl.xlim([-Math.PI,Math.PI])
+      this.ps_pl.xlimlabels(['-π','π'])
     }
     else
       this.ps_pl.xlabel('angle');
@@ -251,16 +267,16 @@ class Pendulum
 
   reset_observables()
   {
-    /*
     this.time = [0];
     this.phi = [this.pendulum_integrator.initial_position];
     this.periodic_phi = [this.pendulum_integrator.initial_position];
     this.phidot = [this.pendulum_integrator.initial_velocity];
-    */
+    /*
     this.time = [];
     this.phi = [];
     this.periodic_phi = [];
     this.phidot = [];
+    */
   }
 
   set_parameters(params)
