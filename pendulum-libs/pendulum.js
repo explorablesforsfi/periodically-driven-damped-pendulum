@@ -190,7 +190,9 @@ class Pendulum
     this.draw_canv = d3.select(div)
                    .append('canvas')
                    .attr('width', this.pendulum_width)
-                   .attr('height', this.pendulum_height);
+                   .attr('height', this.pendulum_height)
+                   ;
+    //d3.select(div).style("border","1px solid black")
     this.draw_ctx = this.draw_canv.node().getContext('2d');
 
     // adjust for retina display
@@ -264,6 +266,26 @@ class Pendulum
   init_draw()
   {
   }
+
+  reset()
+  {
+    this.pendulum_integrator.reset_ode();
+    this.reset_observables();
+
+    if (this.draw_pendulum)
+    {
+      this.init_draw();
+      this.draw_update();
+    }
+
+    if (this.plot_pendulum)
+    {
+      this.init_plot();
+      this.plot_update();
+    }
+
+  }
+
 
   reset_observables()
   {

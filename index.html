@@ -14,35 +14,55 @@
 </head>
 <body>
 
-    <div id="standard_container" style="">
+    <div id="standard_container" style="margin: 5">
 
-        <div id="standard_gui_container" style="margin:2;"></div>
-        <div id="standard_pendulum_container" style="margin:2;"></div>
-        <div id="standard_plot_container" style="margin:2;"></div>
+        <p> There should be text here describing the movement of a pendulum only affected by gravity.
+            Also the corresponding equation of motion should be shown.
+        </p>
 
-    </div>
-
-    <div id="friction_container">
-
-        <div id="friction_gui_container" style="margin:2;"></div>
-        <div id="friction_pendulum_container" style="margin:2;"></div>
-        <div id="friction_plot_container" style="margin:2;"></div>
+        <div id="standard_gui_container" style="margin:5;"></div>
+        <div id="standard_pendulum_container" style="margin:5;"></div>
+        <div id="standard_plot_container" style="margin:5;"></div>
 
     </div>
 
-    <div id="driven_container">
+    <div id="friction_container" style="margin: 5">
 
-        <div id="driven_gui_container" style="margin:2;"></div>
-        <div id="driven_pendulum_container" style="margin:2;"></div>
-        <div id="driven_plot_container" style="margin:2;"></div>
+        <p> There should be text here describing the movement of a pendulum affected by gravity and friction.
+            A legend should be added describing that at high angular velocity, the pendulum loses more energy
+            which is highlighted by its red color.
+            Also the corresponding equation of motion should be shown.
+        </p>
+
+        <div id="standard_gui_container" style="margin:5;"></div>
+        <div id="friction_gui_container" style="margin:5;"></div>
+        <div id="friction_pendulum_container" style="margin:5; "></div>
+        <div id="friction_plot_container" style="margin:5;"></div>
 
     </div>
 
-    <div id="main_container">
+    <div id="driven_container" style="margin: 5">
 
-        <div id="main_gui_container" style="margin:2;"></div>
-        <div id="pendulum_container" style="margin:2;"></div>
-        <div id="plot_container" style="margin:2;"></div>
+        <p> There should be text here describing the movement of a pendulum affected by neither gravity nor friction,
+            but only the driving force.
+            A legend should be added describing that the little red wiggly thing refers to the driving motor
+            Also the corresponding equation of motion should be shown.
+        </p>
+
+        <div id="driven_gui_container" style="margin:5;"></div>
+        <div id="driven_pendulum_container" style="margin:5; "></div>
+        <div id="driven_plot_container" style="margin:5;"></div>
+
+    </div>
+
+    <div id="main_container" style="margin: 5">
+
+        <p> Tere should be text here describing that if you combine those elements above, chaotic behavior can be observed for certain values of the driving force amplitude.
+        </p>
+
+        <div id="main_gui_container" style="margin:5;"></div>
+        <div id="pendulum_container" style="margin:5; "></div>
+        <div id="plot_container" style="margin:5;"></div>
 
     </div>
 
@@ -78,6 +98,8 @@
     d3.select("#standard_container")
       .on("mouseover", function() {std_pend.start()})
       .on("mouseout", function() {std_pend.stop()})
+      //.style("max-width", std_pend.plot_width * 2 + 10)
+      .style("border", "1px solid black")
     ;
 
     var fric_pend = new Pendulum({
@@ -128,6 +150,8 @@
     d3.select("#friction_container")
       .on("mouseover", function() {fric_pend.start()})
       .on("mouseout", function() {fric_pend.stop()})
+      //.style("max-width", fric_pend.plot_width * 2 + 10)
+      .style("border", "1px solid black")
     ;
 
 
@@ -163,6 +187,8 @@
     d3.select("#driven_container")
       .on("mouseover", function() {driven_pend.start()})
       .on("mouseout", function() {driven_pend.stop()})
+      //.style("max-width", driven_pend.plot_width * 2 + 10)
+      .style("border", "1px solid black")
     ;
 
 

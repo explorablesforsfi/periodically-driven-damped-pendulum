@@ -39,7 +39,7 @@ function start_main_gui(div_id,width,height,pendulum)
 
 		// we first define the button parameters
 
-		let b4 = { id:"b4", name:"", actions: ["pause","play"], value: 0};
+		let b4 = { id:"b4", name:"", actions: ["play","pause"], value: 0};
 		let b5 = { id:"b5", name:"", actions: ["stop"], value: 0};
 
 		// values of these parameters are changed when the widget is activated
@@ -55,9 +55,8 @@ function start_main_gui(div_id,width,height,pendulum)
       }),
 			widget.button(b5).size(60).symbolSize(30).update(function(d){
         if (pendulum.is_running)
-          pendulum.stop()
-        pendulum.pendulum_integrator.reset_ode();
-        pendulum.reset_observables();
+          buttons[0].click();
+        pendulum.reset();
       }),
 		]
 		// now we define a block in the control panel where the buttons should be placed
